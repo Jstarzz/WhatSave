@@ -8,176 +8,113 @@
 </head>
 <body>
   <header class="app-header">
-    <div class="brand">
-      <img src="assets/logo.svg" alt="logo" />
-      <div class="titles">
-        <h1>WhatSave</h1>
-        <p>WhatsApp media downloader by Jstarzz</p>
-      </div>
+    <img src="assets/logo.svg" width="28" height="28" alt="" />
+    <div>
+      <h1>WhatSave</h1>
+      <p>Bulk media downloader for WhatsApp Web</p>
     </div>
   </header>
 
-  <main class="card">
-    <section>
-      <div class="row between" style="margin-bottom:6px;">
-        <label class="label" style="margin:0;">Chats (select one or more)</label>
-        <button type="button" id="refresh" class="link-btn">Update chat list</button>
+  <main>
+    <section class="section">
+      <div class="section-head">
+        <h2><label for="chatSelect">Chats</label></h2>
+        <button type="button" id="refresh" class="btn-quiet">Update list</button>
       </div>
       <select id="chatSelect" class="select" multiple size="6" disabled>
-        <option value="" disabled>Loading chats...</option>
+        <option value="">Loading chats...</option>
       </select>
+      <p class="hint">Select one or more.</p>
     </section>
 
-    <!-- Statistics Section -->
-    <section id="statsSection" style="display:none;">
-      <div class="stats-card">
-        <div class="stats-header">
-          <h3 class="stats-title">Chat Statistics</h3>
-          <button id="closeStatsBtn" class="btn-close-stats" title="Hide statistics">×</button>
+    <section class="section" id="statsSection" style="display:none;">
+      <div class="stats">
+        <div class="stats-head">
+          <h2>Chat statistics</h2>
+          <button type="button" id="closeStatsBtn" class="btn-icon" aria-label="Hide statistics">&times;</button>
         </div>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">Date Range:</span>
-            <span class="stat-value" id="statDateRange">-</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Total Media (loaded)</span>
-            <span class="stat-value" id="statMediaCount">-</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Images</span>
-            <span class="stat-value" id="statImages">-</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Videos</span>
-            <span class="stat-value" id="statVideos">-</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Audio</span>
-            <span class="stat-value" id="statAudio">-</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Documents</span>
-            <span class="stat-value" id="statDocuments">-</span>
-          </div>
-        </div>
-        <button id="loadMoreBtn" class="btn load-more">Load More Messages (optional)</button>
-        <p class="load-more-hint">Works for one chat at a time. WhatsApp Web can only retrieve about a year of history.</p>
+        <dl>
+          <dt>Date range</dt>          <dd id="statDateRange">-</dd>
+          <dt>Total media (loaded)</dt><dd id="statMediaCount">-</dd>
+          <dt>Images</dt>              <dd id="statImages">-</dd>
+          <dt>Videos</dt>              <dd id="statVideos">-</dd>
+          <dt>Audio</dt>               <dd id="statAudio">-</dd>
+          <dt>Documents</dt>           <dd id="statDocuments">-</dd>
+        </dl>
+        <p class="hint">WhatsApp Web keeps about a year of history loaded. Load more to reach further back.</p>
+        <button type="button" id="loadMoreBtn" class="btn" style="margin-top:8px;">Load more messages</button>
       </div>
     </section>
 
-    <h2 class="section-title">Media Download</h2>
-
-    <section class="grid">
-      <div>
-        <label class="label">From</label>
-        <input id="dateFrom" type="date" class="input" />
-      </div>
-      <div>
-        <label class="label">To</label>
-        <input id="dateTo" type="date" class="input" />
-      </div>
-    </section>
-
-    <section>
-      <div class="row between" style="margin-bottom:8px;">
-        <label class="label" style="margin:0;">Media Type</label>
-        <div class="quick-filters">
-          <button type="button" id="filterAll" class="link-btn">All</button>
-          <button type="button" id="filterVideosOnly" class="link-btn">Videos only</button>
+    <section class="section">
+      <div class="section-head">
+        <h2>Media type</h2>
+        <div class="row">
+          <button type="button" id="filterAll" class="btn-quiet">All</button>
+          <button type="button" id="filterVideosOnly" class="btn-quiet">Videos only</button>
         </div>
       </div>
-      <div class="chips">
-        <label class="chip with-icon">
-          <input type="checkbox" class="t" value="image" checked>
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-6-6-5 5-3-3-4 4"/></svg>
-          </span>
-          <span>Images</span>
-        </label>
-
-        <label class="chip with-icon">
-          <input type="checkbox" class="t" value="video" checked>
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="M17 9l4-2v10l-4-2z"/></svg>
-          </span>
-          <span>Video</span>
-        </label>
-
-        <label class="chip with-icon">
-          <input type="checkbox" class="t" value="audio" checked>
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4 10v4h3l5 4V6l-5 4H4z"/><path d="M16 10a3 3 0 0 1 0 4"/><path d="M18.5 8.5a6 6 0 0 1 0 7"/></svg>
-          </span>
-          <span>Audio</span>
-        </label>
-
-        <label class="chip with-icon">
-          <input type="checkbox" class="t" value="document" checked>
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v6h6"/></svg>
-          </span>
-          <span>Documents</span>
-        </label>
+      <div class="types">
+        <label class="check"><input type="checkbox" class="t" value="image" checked> Images</label>
+        <label class="check"><input type="checkbox" class="t" value="video" checked> Video</label>
+        <label class="check"><input type="checkbox" class="t" value="audio" checked> Audio</label>
+        <label class="check"><input type="checkbox" class="t" value="document" checked> Documents</label>
       </div>
     </section>
 
-    <section class="row between">
-      <div class="col">
-        <label class="label" style="display:block;margin-top:6px;">
-          <input type="checkbox" id="appendOrigNameAll" checked>
-          Append original filename
-        </label>
-        <label class="label" style="display:block;margin-top:6px;">
-          <input type="checkbox" id="useDate"> Use date in filename
-        </label>
-        <label class="label" style="display:block;margin-top:6px;">
-          <input type="checkbox" id="includeSenderName"> Add sender name to filename
-        </label>
-        <label class="label" style="display:block;margin-top:6px;">
-          <input type="checkbox" id="useCaptionSuffix"> Use caption in filename as suffix
-        </label>
-        <label class="label" style="display:block;margin-top:6px;">
-          <input type="checkbox" id="saveAsZip" checked> Save as single ZIP
-        </label>
-        <label class="label" style="display:block;margin-top:6px;">
-          <input type="checkbox" id="deepScan">
-          Deep scan (slower, searches further back in history)
-        </label>
+    <section class="section">
+      <h2>Date range</h2>
+      <div class="grid-2" style="margin-top:12px;">
+        <div class="field">
+          <label for="dateFrom">From</label>
+          <input id="dateFrom" type="date" class="input" max="2100-12-31" />
+        </div>
+        <div class="field">
+          <label for="dateTo">To</label>
+          <input id="dateTo" type="date" class="input" max="2100-12-31" />
+        </div>
       </div>
+      <p class="hint">Leave empty for all dates.</p>
     </section>
 
-    <section class="row between" style="align-items:center; gap:8px;">
-      <label class="label" style="margin:0;">
-        Parallel downloads
-        <select id="concurrency" class="select" style="width:auto; display:inline-block; padding:6px 8px; margin-left:6px;">
+    <section class="section">
+      <h2>Options</h2>
+      <div class="options" style="margin-top:8px;">
+        <label class="check"><input type="checkbox" id="saveAsZip" checked> Save as single ZIP</label>
+        <label class="check"><input type="checkbox" id="appendOrigNameAll" checked> Append original filename</label>
+        <label class="check"><input type="checkbox" id="useDate"> Add date to filename</label>
+        <label class="check"><input type="checkbox" id="includeSenderName"> Add sender to filename</label>
+        <label class="check"><input type="checkbox" id="useCaptionSuffix"> Add caption to filename</label>
+        <label class="check"><input type="checkbox" id="deepScan"> Deep scan (slower, reaches further back)</label>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label for="concurrency">Parallel downloads</label>
+        <select id="concurrency" class="select">
           <option value="2">2</option>
           <option value="4" selected>4</option>
           <option value="6">6</option>
           <option value="8">8</option>
         </select>
-      </label>
-    </section>
-
-    <section class="row between" style="align-items:center; gap:8px;">
-      <button id="start" class="btnd">Download all</button>
-    </section>
-
-    <section>
-      <div class="progress" id="progressWrap" style="display:none;">
-        <div class="bar" id="bar" style="width:0%"></div>
       </div>
-      <pre id="log" class="log"></pre>
+    </section>
+
+    <section class="section">
+      <button id="start" class="btn-primary">Download all</button>
+    </section>
+
+    <section class="section">
+      <h2><label for="log">Activity</label></h2>
+      <div class="progress" id="progressWrap" style="display:none;">
+        <div class="bar" id="bar"></div>
+      </div>
+      <pre id="log" class="log" role="log" aria-live="polite" tabindex="0"></pre>
     </section>
   </main>
 
   <footer class="footer">
-    <div>WhatSave. Free and open source.</div>
-    <div class="credit">
-      Built by <a href="https://github.com/Jstarzz" target="_blank" rel="noopener">Jstarzz</a>
-      <span class="dot">·</span>
-      <a href="https://github.com/Jstarzz/whatsave" target="_blank" rel="noopener" class="star-link">Star on GitHub</a>
-    </div>
+    <span>Free and open source</span>
+    <a href="https://github.com/Jstarzz/WhatSave" target="_blank" rel="noopener">github.com/Jstarzz/WhatSave</a>
   </footer>
 
   <script src="popup.js"></script>

@@ -2,12 +2,18 @@
 // Finds media messages in a chat, downloads their blobs, and hands them off
 // to the extension (background.js) to save via chrome.downloads.
 (function () {
+  // Bumped whenever the popup <-> page message format changes. The popup
+  // compares this against its own copy so a tab left open across an extension
+  // update does not keep serving an older app.js to a newer popup.
+  const APP_VERSION = '1.1.0';
+
   // Guard against double injection.
   if (window.__WAMD_APP_LOADED__) {
     window.postMessage({ __from: 'wamd:inpage', type: 'wa:log', message: 'app.js already loaded' }, '*');
     return;
   }
   window.__WAMD_APP_LOADED__ = true;
+  window.__WAMD_APP_VERSION__ = APP_VERSION;
 
   const busSend = (type, payload) => window.postMessage({ __from: 'wamd:inpage', type, ...payload }, '*');
   const log = (m) => busSend('wa:log', { message: String(m) });

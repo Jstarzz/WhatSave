@@ -10,3 +10,6 @@ already-existing-one/
 
 # Packaged builds
 *.zip
+
+# Design audit output
+.slop-artifacts/
