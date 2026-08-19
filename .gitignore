@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+*.log
+
+# Local tooling state
+.freebuff/
+
+# Earlier build of the extension, kept locally for reference only
+already-existing-one/
+
+# Packaged builds
+*.zip
