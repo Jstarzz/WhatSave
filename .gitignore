@@ -10,3 +10,11 @@ already-existing-one/
 
 # Packaged builds
 *.zip
+
+# Design audit output
+.slop-artifacts/
+
+# Store listing assets. The raw captures show real chat names and group ids,
+# so nothing in here belongs in a public repository.
+screenshots/
+.shot-src.html

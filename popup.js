@@ -118,7 +118,43 @@ async function injectFile(tabId, file) {
   });
 }
 
+// Must match APP_VERSION in inpage/app.js.
+const APP_VERSION = '1.2.0';
+
+function waitForTabComplete(tabId, timeoutMs = 20000) {
+  const deadline = Date.now() + timeoutMs;
+  return new Promise((resolve) => {
+    const poll = async () => {
+      try {
+        const tab = await chrome.tabs.get(tabId);
+        if (tab.status === 'complete') return resolve(true);
+      } catch (_) {
+        return resolve(false);
+      }
+      if (Date.now() > deadline) return resolve(false);
+      setTimeout(poll, 250);
+    };
+    setTimeout(poll, 300);
+  });
+}
+
 async function ensureInjected(tabId) {
+  // A tab open since before an extension update still has the previous
+  // app.js in it, and app.js's own load guard means injecting again is a
+  // no-op. The popup would then be sending the current command format to
+  // code that predates it, which fails in confusing ways rather than
+  // loudly. Reload the tab so the current build gets a clean injection.
+  const injected = await runInMain(tabId, () => ({
+    loaded: !!window.__WAMD_APP_LOADED__,
+    version: window.__WAMD_APP_VERSION__ || null
+  }));
+
+  if (injected?.loaded && injected.version !== APP_VERSION) {
+    log('Tab is running an older version of the extension. Reloading WhatsApp Web...');
+    await chrome.tabs.reload(tabId);
+    await waitForTabComplete(tabId);
+  }
+
   const hasWpp = await runInMain(tabId, () => !!window.WPP);
   if (!hasWpp) {
     await injectFile(tabId, 'inpage/vendor/wppconnect-wa-wrapped.js').catch(e => log('Vendor injection error: ' + e.message));
@@ -296,13 +332,13 @@ loadMoreBtn?.addEventListener('click', async () => {
   }
 
   loadMoreBtn.disabled = false;
-  loadMoreBtn.textContent = 'Load More Messages (optional)';
+  loadMoreBtn.textContent = 'Load more messages';
   log('Finished loading older history. Check the updated statistics.');
 });
 
 async function refreshChats() {
   chatSel.disabled = true;
-  chatSel.innerHTML = `<option value="" disabled>Loading chats...</option>`;
+  chatSel.innerHTML = `<option value="">Loading chats...</option>`;
   await sendToPage({ __from: 'wamd:inpage', type: 'popup:ready?' });
   await sendToPage({ __from: 'wamd:inpage', type: 'popup:cmd', cmd: 'listChats', payload: {} });
 }

@@ -75,6 +75,10 @@ Built by [Jstarzz](https://github.com/Jstarzz). A star on the
 - This project is not affiliated with, endorsed by, or associated with
   WhatsApp or Meta.
 
+## Privacy
+
+Nothing is collected, stored, or transmitted anywhere. See `PRIVACY.md`.
+
 ## License
 
 MIT for the code in this repository (see `LICENSE`). The bundled `wa-js`
