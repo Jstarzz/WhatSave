@@ -26,13 +26,13 @@ Built by [Jstarzz](https://github.com/Jstarzz). A star on the
 
 ## How it works
 
-- `inpage/vendor/wppconnect-wa-wrapped.js` is the open-source
-  [WPPConnect `wa-js`](https://github.com/wppconnect-team/wa-js) library,
-  bundled as-is. It gives the extension a supported way to read chats and
-  messages from WhatsApp Web's own in-memory store. That project has its own
-  license (Apache-2.0 at the time of writing), keep its copyright notice
-  intact and check its repo for the current terms before redistributing this
-  extension.
+- `inpage/vendor/wppconnect-wa-wrapped.js` is
+  [WPPConnect `wa-js`](https://github.com/wppconnect-team/wa-js) v4.4.3,
+  bundled unmodified. It gives the extension a supported way to read chats
+  and messages from WhatsApp Web's own in-memory store. It is Apache-2.0,
+  and the notices for it and everything it bundles are in
+  `inpage/vendor/wppconnect-wa.js.LICENSE.txt`. Keep that file alongside it
+  when redistributing, and check upstream for the current terms.
 - `inpage/app.js` runs in the page's main world, uses `wa-js` to list chats,
   scan chats for media messages, and download each one's underlying blob.
 - `content.js` bridges page and extension messages.
@@ -81,5 +81,8 @@ Nothing is collected, stored, or transmitted anywhere. See `PRIVACY.md`.
 
 ## License
 
-MIT for the code in this repository (see `LICENSE`). The bundled `wa-js`
-vendor file remains under its own upstream license, see the note above.
+MIT for the code in this repository (see `LICENSE`). That covers everything
+except `inpage/vendor/`, which is third-party: `wa-js` is Apache-2.0, and
+the libraries bundled inside it are MIT and BSD-3-Clause. Their notices ship
+in `inpage/vendor/wppconnect-wa.js.LICENSE.txt` and are not relicensed by
+the MIT grant above.
