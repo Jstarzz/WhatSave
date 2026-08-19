@@ -119,7 +119,7 @@ async function injectFile(tabId, file) {
 }
 
 // Must match APP_VERSION in inpage/app.js.
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 
 function waitForTabComplete(tabId, timeoutMs = 20000) {
   const deadline = Date.now() + timeoutMs;

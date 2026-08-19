@@ -5,7 +5,7 @@
   // Bumped whenever the popup <-> page message format changes. The popup
   // compares this against its own copy so a tab left open across an extension
   // update does not keep serving an older app.js to a newer popup.
-  const APP_VERSION = '1.1.0';
+  const APP_VERSION = '1.2.0';
 
   // Guard against double injection.
   if (window.__WAMD_APP_LOADED__) {
@@ -28,9 +28,12 @@
 
   function getTimeoutForMedia(m) {
     const kind = (m.type || m.mediaType || '').toLowerCase();
-    if (kind === 'video') return 20000;
-    if (kind === 'document') return 12000;
-    return 8000; // images/audio
+    // WhatsApp decrypts and re-fetches each file server-side, so a long video
+    // over a slow link can legitimately sit well past 20s before the blob
+    // lands. Cutting it off early loses media that would have arrived.
+    if (kind === 'video') return 45000;
+    if (kind === 'document') return 20000;
+    return 10000; // images/audio
   }
 
   function getMediaStage(m) {
@@ -810,6 +813,7 @@
   // applies to page-initiated downloads, the real blocker to downloading
   // many files in one go.
   let downloadSeq = 0;
+  let downloadInProgress = false;
   const pendingDownloads = new Map();
 
   window.addEventListener('message', (ev) => {
@@ -851,6 +855,32 @@
         payload: { base64, filename, mime }
       }, '*');
     });
+  }
+
+  // A whole-chat ZIP routinely runs to hundreds of megabytes. Base64 for the
+  // extension bridge inflates that by a third and has to hold it as one
+  // string, which passes the engine's maximum string length and throws
+  // "Invalid string length", losing the entire batch at the last step. Hand
+  // the blob to an anchor instead. This is a page-initiated download, but it
+  // is a single file, so Chrome's multiple-download prompt does not apply.
+  // Chrome strips directories from the download attribute, so the ZIP lands
+  // in the Downloads root rather than a subfolder.
+  function saveBlobFromPage(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: String(e?.message || e) };
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
   }
 
   async function postDownload({ arrayBuffer, filename, mime }) {
@@ -1037,9 +1067,10 @@
 
       log(`Building ZIP with ${entries.length} file(s)…`);
       const zipBytes = await makeZip(entries);
-      const zipName = `WA Media Downloads/${chatFolder}_media.zip`;
-      const res = await postDownload({ arrayBuffer: zipBytes.buffer, filename: zipName, mime: 'application/zip' });
-      saved = res?.ok ? entries.length : 0;
+      const zipName = `${chatFolder}_media.zip`;
+      const res = saveBlobFromPage(new Blob([zipBytes], { type: 'application/zip' }), zipName);
+      if (!res.ok) log(`Save failed: ${zipName}, ${res.error}`);
+      saved = res.ok ? entries.length : 0;
       log(`Done. ${saved}/${total} file(s) zipped.`);
       return { count: saved, zip: true };
     }
@@ -1103,26 +1134,39 @@
           return;
         }
 
-        const chats = await listChats();
-        const map = new Map(chats.map(c => [c.id, c.name]));
-
-        const from = dateFrom ? dayRangeToEpochSeconds(dateFrom).start : undefined;
-        const to = dateTo ? dayRangeToEpochSeconds(dateTo).end : undefined;
-
-        let totalCount = 0;
-        for (let i = 0; i < ids.length; i++) {
-          const chatId = ids[i];
-          const chatName = map.get(chatId) || chatId;
-          if (ids.length > 1) log(`Chat ${i + 1}/${ids.length}: ${chatName}`);
-
-          const res = await downloadMessages({ chatId, chatsFriendlyMap: map, types, from, to, naming, pack });
-          totalCount += res?.count || 0;
+        // Two runs over the same chat would fight over the same media and
+        // double the load on WhatsApp's servers, which is enough to push
+        // large videos past their download timeout.
+        if (downloadInProgress) {
+          log('A download is already running. Wait for it to finish.');
+          return;
         }
+        downloadInProgress = true;
 
-        window.postMessage({
-          __from: 'wamd:inpage', type: 'inpage:resp', cmd,
-          payload: { count: totalCount, chats: ids.length }
-        }, '*');
+        try {
+          const chats = await listChats();
+          const map = new Map(chats.map(c => [c.id, c.name]));
+
+          const from = dateFrom ? dayRangeToEpochSeconds(dateFrom).start : undefined;
+          const to = dateTo ? dayRangeToEpochSeconds(dateTo).end : undefined;
+
+          let totalCount = 0;
+          for (let i = 0; i < ids.length; i++) {
+            const chatId = ids[i];
+            const chatName = map.get(chatId) || chatId;
+            if (ids.length > 1) log(`Chat ${i + 1}/${ids.length}: ${chatName}`);
+
+            const res = await downloadMessages({ chatId, chatsFriendlyMap: map, types, from, to, naming, pack });
+            totalCount += res?.count || 0;
+          }
+
+          window.postMessage({
+            __from: 'wamd:inpage', type: 'inpage:resp', cmd,
+            payload: { count: totalCount, chats: ids.length }
+          }, '*');
+        } finally {
+          downloadInProgress = false;
+        }
         return;
       }
 
