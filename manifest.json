@@ -39,7 +39,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "inpage/vendor/wppconnect-wa-wrapped.js",
+        "inpage/vendor/wppconnect-wa.js",
         "inpage/app.js",
         "assets/logo.svg"
       ],

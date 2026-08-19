@@ -1,0 +1,3 @@
+# Vendored third-party files ship byte-identical to their upstream release so
+# reviewers can verify them by hash. Never rewrite their line endings.
+inpage/vendor/** -text

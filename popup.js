@@ -157,7 +157,7 @@ async function ensureInjected(tabId) {
 
   const hasWpp = await runInMain(tabId, () => !!window.WPP);
   if (!hasWpp) {
-    await injectFile(tabId, 'inpage/vendor/wppconnect-wa-wrapped.js').catch(e => log('Vendor injection error: ' + e.message));
+    await injectFile(tabId, 'inpage/vendor/wppconnect-wa.js').catch(e => log('Vendor injection error: ' + e.message));
   }
 
   const appLoaded = await runInMain(tabId, () => !!window.__WAMD_APP_LOADED__);

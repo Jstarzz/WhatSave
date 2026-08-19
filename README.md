@@ -26,7 +26,7 @@ Built by [Jstarzz](https://github.com/Jstarzz). A star on the
 
 ## How it works
 
-- `inpage/vendor/wppconnect-wa-wrapped.js` is
+- `inpage/vendor/wppconnect-wa.js` is
   [WPPConnect `wa-js`](https://github.com/wppconnect-team/wa-js) v4.4.3,
   bundled unmodified. It gives the extension a supported way to read chats
   and messages from WhatsApp Web's own in-memory store. It is Apache-2.0,
