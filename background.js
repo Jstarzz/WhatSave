@@ -12,6 +12,24 @@
 
 const downloads = chrome.downloads;
 
+// Chrome runs this as a service worker, where URL.createObjectURL does not
+// exist, so saves there go out as a data: URL. Firefox runs it as an event
+// page, which has that API, and refuses data: URLs in downloads.download()
+// outright. Pick whichever the engine actually supports.
+function buildDownloadUrl(b64, mime) {
+  const type = mime || 'application/octet-stream';
+
+  if (typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type }));
+    return { url, revoke: () => URL.revokeObjectURL(url) };
+  }
+
+  return { url: `data:${type};base64,${b64}`, revoke: () => {} };
+}
+
 // Fallback: raw ArrayBuffer -> base64 (used only if a caller ever sends a
 // buffer instead of a pre-encoded string).
 function arrayBufferToBase64(buffer) {
@@ -40,14 +58,20 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           return;
         }
 
-        const dataUrl = `data:${mime || 'application/octet-stream'};base64,${b64}`;
+        const { url, revoke } = buildDownloadUrl(b64, mime);
 
-        await downloads.download({
-          url: dataUrl,
-          filename,
-          saveAs: false,
-          conflictAction: 'uniquify'
-        });
+        try {
+          await downloads.download({
+            url,
+            filename,
+            saveAs: false,
+            conflictAction: 'uniquify'
+          });
+        } finally {
+          // Revoking straight away would cancel a download still being
+          // written, so hold the URL open well past the handoff.
+          setTimeout(revoke, 60000);
+        }
 
         sendResponse({ ok: true });
         return;
