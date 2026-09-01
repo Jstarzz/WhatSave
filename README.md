@@ -11,7 +11,7 @@ Built by [Jstarzz](https://github.com/Jstarzz). A star on the
 
 - [Google Chrome](https://chromewebstore.google.com/detail/whatsave/adfogoknhlpeimmpgpgmoifmbjeboghk)
 - [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/whatsave/)
-- [Microsoft Edge](https://chromewebstore.google.com/detail/whatsave/adfogoknhlpeimmpgpgmoifmbjeboghk) (install from the Chrome Web Store)
+- [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/obfgahgppjfldighpfohcpahmlioaelf)
 
 ## Features
 
