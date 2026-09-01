@@ -7,6 +7,12 @@ or more chats at once, either as loose files or a single ZIP.
 Built by [Jstarzz](https://github.com/Jstarzz). A star on the
 [repo](https://github.com/Jstarzz/whatsave) helps other people find it.
 
+## Install
+
+- [Google Chrome](https://chromewebstore.google.com/detail/whatsave/adfogoknhlpeimmpgpgmoifmbjeboghk)
+- [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/whatsave/)
+- [Microsoft Edge](https://chromewebstore.google.com/detail/whatsave/adfogoknhlpeimmpgpgmoifmbjeboghk) (install from the Chrome Web Store)
+
 ## Features
 
 - No limits and no license key. Everything is unlocked.
