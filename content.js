@@ -11,6 +11,8 @@
 
   // Page -> extension (background or popup).
   window.addEventListener('message', (ev) => {
+    // Only accept messages posted by this window (inpage/app.js), not frames.
+    if (ev.source !== window) return;
     const { data } = ev;
     if (!data || data.__from !== 'wamd:inpage') return;
 

@@ -26,15 +26,17 @@ Built by [Jstarzz](https://github.com/Jstarzz). A star on the
   page happens to have cached, so files save at their original quality.
 - Downloads run 2, 4, 6, or 8 files at a time rather than strictly one.
 - Individual files land in `Downloads/WA Media Downloads/<Chat Name>/...`
-  instead of loose in your Downloads root.
+  instead of loose in your Downloads root. A ZIP is saved by the page
+  rather than the extension (it can be too large to pass across), so it
+  lands in the Downloads root as `<Chat Name>_media.zip`.
 - Progress reporting, a bounded log panel so a large batch does not bog down
   the popup, and "All types" / "Videos only" filter buttons.
 
 ## How it works
 
 - `inpage/vendor/wppconnect-wa-wrapped.js` is the open-source
-  [WPPConnect `wa-js`](https://github.com/wppconnect-team/wa-js) library,
-  bundled as-is. It gives the extension a supported way to read chats and
+  [WPPConnect `wa-js`](https://github.com/wppconnect-team/wa-js) library
+  (v4.4.3), bundled as-is. It gives the extension a supported way to read chats and
   messages from WhatsApp Web's own in-memory store. That project has its own
   license (Apache-2.0 at the time of writing), keep its copyright notice
   intact and check its repo for the current terms before redistributing this
@@ -48,11 +50,39 @@ Built by [Jstarzz](https://github.com/Jstarzz). A star on the
 
 ## Installing it unpacked
 
-1. Open `chrome://extensions`.
-2. Enable **Developer mode** (top right).
+Chrome or Edge:
+
+1. Open `chrome://extensions` (or `edge://extensions`).
+2. Enable **Developer mode**.
 3. Click **Load unpacked** and select this folder.
-4. Open [web.whatsapp.com](https://web.whatsapp.com), log in, then click the
-   extension icon.
+
+Firefox (128 or newer):
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on** and pick `manifest.json`.
+
+Then open [web.whatsapp.com](https://web.whatsapp.com), log in, and click
+the extension icon.
+
+## Packaging a release
+
+The same folder is the build. Bump `version` in `manifest.json`, then zip
+the extension files without the repo metadata:
+
+```sh
+zip -r whatsave-<version>.zip manifest.json background.js content.js   popup.html popup.js popup.css inpage assets icons
+```
+
+Upload that ZIP to each store.
+
+## Troubleshooting
+
+- **Chat list is empty:** click **Update chat list**. WhatsApp Web has to
+  finish loading first; on a slow connection that can take a while.
+- **Old media missing:** use **Load More Messages** on the chat first.
+- **It stopped working after a WhatsApp update:** WhatsApp Web changes its
+  internals often and `wa-js` follows. Open an issue with the popup log;
+  the fix is usually a newer `wa-js` build.
 
 ## Using it
 
